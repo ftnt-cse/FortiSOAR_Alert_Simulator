@@ -211,7 +211,7 @@ def cook_alert(incident,malware_hashes_file,malicious_urls_file,malicious_ip_fil
 		body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destIpAddr:"+bad_ip+","
 
 	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_VPN_LOGON_SUCCESS_OUTSIDE_COUNTRY':
-		foreign_ip = "13.248.104."+str(random.randint(1, 254))
+		foreign_ip = "192.58.142."+str(random.randint(1, 254))
 		body['data'][0]['sourcedata']['incident']['sourceUser'] = random.choices(usernames)[0]
 		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = foreign_ip
 		body['data'][0]['sourcedata']['incident']['incidentSrc'] = "srcIpAddr:"+foreign_ip+","
