@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/bin/python3
 # FSR-Simulator is a CLI program to generate FSM like incidents for FSR
 # Script simulates an Asset server : 192.168.10.10 connected to the internet via FortiGate Firewall : 192.168.10.254
 # FortiSOAR CSE Team
