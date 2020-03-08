@@ -247,10 +247,33 @@ def cook_alert(incident,malware_hashes_file,malicious_urls_file,malicious_ip_fil
 
 	return body
 
-def fsr_send_alert(server,headers,body):
+def lookup_tenant_iri(server,headers,tenant_name):
+	try:
+		response = requests.get(url='https://'+server+'/api/3/tenants',
+			headers=headers,verify=False)
+
+		if response.status_code != 200:
+			print(bcolors.FAIL+'Error retrieving tenants IRI:'+response.text+bcolors.ENDC)
+			exit()
+		tenants=response.json()
+		for tenant in tenants['hydra:member']:
+			if tenant_name in tenant['name']:
+				return tenant
+		else:
+			print(bcolors.FAIL+"Tenant not found"+bcolors.ENDC)
+			exit()
+	except requests.ConnectionError:
+		print(bcolors.FAIL+"Connection error"+bcolors.ENDC)
+		exit()
+	except requests.ConnectTimeout:
+		print(bcolors.FAIL+"Connection timeout"+bcolors.ENDC)
+		exit()
+
+def fsr_send_alert(server,headers,body, tenant=None):
 
 	try:
-
+		if tenant:
+			body['data'][0]['tenant'] = tenant
 		response = requests.post(url='https://'+server+'/api/3/insert/alerts',
 			headers=headers,json=body,verify=False)
 
@@ -279,8 +302,9 @@ def main():
 	parser.add_argument('-s', '--server',type=str, required=True, help="FortiSOAR IP Address (wihout http://)")
 	parser.add_argument('-u', '--username',type=str, required=True, help="FortiSOAR Username")
 	parser.add_argument('-p', '--password',type=str, required=False, default='Rotana@1492',help="FortiSOAR Password")
-	parser.add_argument('-t', '--template',type=str, required=True, help="Incident Template file (One of the files under ./templates) exp: ./templates/PH_RULE_AO_MALWARE_HASH_MATCH.json")
+	parser.add_argument('-i', '--incident_template',type=str, required=True, help="Incident Template file (One of the files under ./templates) exp: ./templates/PH_RULE_AO_MALWARE_HASH_MATCH.json")
 	parser.add_argument('-r', '--random',type=str, required=False, default='yes', choices=['yes', 'no'],help='if True, the IoC within the alert will be random')
+	parser.add_argument('-t', '--tenant',type=str, required=False, help='Tenant IRI')
 
 	args = parser.parse_args()
 	headers=fsr_login(args.server,args.username,args.password)
@@ -288,13 +312,10 @@ def main():
 		is_random=False
 	else:
 		is_random=True
-	body=cook_alert(args.template,malware_hashes,malicious_urls,malicious_ips,malicious_domains,is_random)
+	body=cook_alert(args.incident_template,malware_hashes,malicious_urls,malicious_ips,malicious_domains,is_random)
 
 	# FortiGuard C&C scenario : 2 alerts, same dst IP, different src IP
 	if 	body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_TO_FORTIGUARD_MALWARE_IP':
-
-		# source_ip = body['data'][0]['sourcedata']['incident']['srcIpAddr']
-		# source_ip = source_ip.replace('74',str(random.randint(100, 200)))
 		source_ip='192.168.10.'+str(random.randint(100, 200))
 		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = source_ip
 		body['data'][0]['sourcedata']['incident']['incidentSrc'] = source_ip
@@ -305,8 +326,10 @@ def main():
 		input('Type anykey to continue')
 		fsr_send_alert(args.server,headers,body)
 		exit()
-
-	fsr_send_alert(args.server,headers,body)
+	if args.tenant:
+		fsr_send_alert(args.server,headers,body,lookup_tenant_iri(args.server,headers,args.tenant)['@id'])
+	else:
+		fsr_send_alert(args.server,headers,body)
 
 
 
