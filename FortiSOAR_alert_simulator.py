@@ -49,7 +49,7 @@ def fsr_login(server,username,password):
 		print(bcolors.FAIL+"Connection timeout"+bcolors.ENDC)
 		exit()
 
-def get_malware_hashes(malware_hashes_file):
+def get_malware_hashes(malware_hashes_file,is_random=True):
 
 	if not os.path.exists(os.path.dirname(malware_hashes_file)):
 		os.makedirs(os.path.dirname(malware_hashes_file))
@@ -71,9 +71,13 @@ def get_malware_hashes(malware_hashes_file):
 			exit()
 
 	lines = open(malware_hashes_file).read().splitlines()
-	return(random.choice(lines))
+	if not is_random:
+		return lines[0]
+	else:
+		return(random.choice(lines))
 
-def get_malicious_urls(malicious_urls_file):
+
+def get_malicious_urls(malicious_urls_file,is_random=True):
 
 	if not os.path.exists(os.path.dirname(malicious_urls_file)):
 		os.makedirs(os.path.dirname(malicious_urls_file))
@@ -95,9 +99,13 @@ def get_malicious_urls(malicious_urls_file):
 			exit()
 
 	lines = open(malicious_urls_file).read().splitlines()
-	return(random.choice(lines))
+	if not is_random:
+		return lines[0]
+	else:
+		return(random.choice(lines))
 
-def get_malicious_ip(malicious_ip_file):
+
+def get_malicious_ip(malicious_ip_file,is_random=True):
 	lines=''
 	if not os.path.exists(os.path.dirname(malicious_ip_file)):
 		os.makedirs(os.path.dirname(malicious_ip_file))
@@ -127,10 +135,13 @@ def get_malicious_ip(malicious_ip_file):
 
 
 	lines = open(malicious_ip_file).read().splitlines()
-	return(random.choice(lines))
+	if not is_random:
+		return lines[0]
+	else:
+		return(random.choice(lines))
 
 
-def get_malicious_domains(malicious_domains_file):
+def get_malicious_domains(malicious_domains_file,is_random=True):
 	lines=''
 	if not os.path.exists(os.path.dirname(malicious_domains_file)):
 		os.makedirs(os.path.dirname(malicious_domains_file))
@@ -160,9 +171,13 @@ def get_malicious_domains(malicious_domains_file):
 
 
 	lines = open(malicious_domains_file).read().splitlines()
-	return(random.choice(lines))
+	if not is_random:
+		return lines[0]
+	else:
+		return(random.choice(lines))
 
-def cook_alert(incident,malware_hashes_file,malicious_urls_file,malicious_ip_file,malicious_domains_file):
+
+def cook_alert(incident,malware_hashes_file,malicious_urls_file,malicious_ip_file,malicious_domains_file,is_random=True):
 	body={
 		"data": [
 			{
@@ -198,15 +213,15 @@ def cook_alert(incident,malware_hashes_file,malicious_urls_file,malicious_ip_fil
 	if body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_AO_MALWARE_HASH_MATCH':
 		filename=''.join([random.choice(string.ascii_letters + string.digits) for n in range(16)])
 		body['data'][0]['sourcedata']['incident']['incidentDetail'] = "fileName:C:\\\\Windows\\\\System32\\\\"+\
-		filename+".exe, hashCode:"+get_malware_hashes(malware_hashes_file)+","
+		filename+".exe, hashCode:"+get_malware_hashes(malware_hashes_file,is_random)+","
 
 	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_DNS_FORTIGUARD_MALWARE_DOMAIN':
-		bad_domain = get_malicious_domains(malicious_domains_file)
+		bad_domain = get_malicious_domains(malicious_domains_file,is_random)
 		body['data'][0]['sourcedata']['incident']['destName'] = bad_domain
 		body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destName:"+bad_domain+","
 
 	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_TO_FORTIGUARD_MALWARE_IP':
-		bad_ip = get_malicious_ip(malicious_ip_file)
+		bad_ip = get_malicious_ip(malicious_ip_file,is_random)
 		body['data'][0]['sourcedata']['incident']['destIpAddr'] = bad_ip
 		body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destIpAddr:"+bad_ip+","
 
@@ -217,14 +232,14 @@ def cook_alert(incident,malware_hashes_file,malicious_urls_file,malicious_ip_fil
 		body['data'][0]['sourcedata']['incident']['incidentSrc'] = "srcIpAddr:"+foreign_ip+","
 
 	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_HIGH_SEV_SEC_IPS_IN_PERMIT':
-		bad_ip = get_malicious_ip(malicious_ip_file)
+		bad_ip = get_malicious_ip(malicious_ip_file,is_random)
 		#TODO : fetch IPS rules from FG and it it's attack ID, feed CSV to FSR Assets
 		body['data'][0]['sourcedata']['incident']['incidentDetail'] = "compEventType:FortiGate-ips-signature-"+str(random.randint(8000, 9000))+", attackName:, incidentCount:6,"
 		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = bad_ip
 		body['data'][0]['sourcedata']['incident']['incidentSrc'] = "srcIpAddr:"+bad_ip+","
 
 	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_WEB_FORTIGUARD_MALWARE_URL':
-		bad_url = get_malicious_urls(malicious_urls)
+		bad_url = get_malicious_urls(malicious_urls,is_random)
 		body['data'][0]['sourcedata']['incident']['destName'] = bad_url.split("//")[1]
 		body['data'][0]['sourcedata']['incident']['incidentDetail'] = "infoURL:"+bad_url+","
 		body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destName:"+bad_url.split("//")[1]+","
@@ -236,12 +251,14 @@ def fsr_send_alert(server,headers,body):
 
 	try:
 
-		response = requests.post(url='https://'+server+'/api/3/insert/alerts', 
+		response = requests.post(url='https://'+server+'/api/3/insert/alerts',
 			headers=headers,json=body,verify=False)
 
 		if response.status_code != 200:
-			print(bcolors.FAIL+'Error Updating :'+bcolors.ENDC)
+			print(bcolors.FAIL+'Error Updating :'+response.text+bcolors.ENDC)
 			exit()
+		else:
+			print(bcolors.OKGREEN+'Alert Sent'+bcolors.ENDC)
 
 		return response.json()
 
@@ -257,19 +274,41 @@ def main():
 	prog='ProgramName',
 	formatter_class=argparse.RawDescriptionHelpFormatter,
 	epilog=textwrap.dedent('''\
-		 Test
+		 FSR Incident Simulator
 		 '''))
 	parser.add_argument('-s', '--server',type=str, required=True, help="FortiSOAR IP Address (wihout http://)")
 	parser.add_argument('-u', '--username',type=str, required=True, help="FortiSOAR Username")
 	parser.add_argument('-p', '--password',type=str, required=False, default='Rotana@1492',help="FortiSOAR Password")
 	parser.add_argument('-t', '--template',type=str, required=True, help="Incident Template file (One of the files under ./templates) exp: ./templates/PH_RULE_AO_MALWARE_HASH_MATCH.json")
+	parser.add_argument('-r', '--random',type=str, required=False, default='yes', choices=['yes', 'no'],help='if True, the IoC within the alert will be random')
 
 	args = parser.parse_args()
 	headers=fsr_login(args.server,args.username,args.password)
-	print(fsr_send_alert(args.server,headers,cook_alert(args.template,malware_hashes,malicious_urls,malicious_ips,malicious_domains)))
+	if args.random.lower() == 'no':
+		is_random=False
+	else:
+		is_random=True
+	body=cook_alert(args.template,malware_hashes,malicious_urls,malicious_ips,malicious_domains,is_random)
+
+	# FortiGuard C&C scenario : 2 alerts, same dst IP, different src IP
+	if 	body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_TO_FORTIGUARD_MALWARE_IP':
+
+		# source_ip = body['data'][0]['sourcedata']['incident']['srcIpAddr']
+		# source_ip = source_ip.replace('74',str(random.randint(100, 200)))
+		source_ip='192.168.10.'+str(random.randint(100, 200))
+		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = source_ip
+		body['data'][0]['sourcedata']['incident']['incidentSrc'] = source_ip
+		fsr_send_alert(args.server,headers,body)
+		source_ip='192.168.10.'+str(random.randint(100, 200))
+		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = source_ip
+		body['data'][0]['sourcedata']['incident']['incidentSrc'] = source_ip
+		input('Type anykey to continue')
+		fsr_send_alert(args.server,headers,body)
+		exit()
+
+	fsr_send_alert(args.server,headers,body)
 
 
 
 if __name__ == '__main__':
 	main()
-
