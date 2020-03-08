@@ -293,6 +293,7 @@ def fsr_send_alert(server,headers,body, tenant=None):
 		exit()
 
 def main():
+	tenant_iri=None
 	parser = argparse.ArgumentParser(
 	prog='ProgramName',
 	formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -314,22 +315,22 @@ def main():
 		is_random=True
 	body=cook_alert(args.incident_template,malware_hashes,malicious_urls,malicious_ips,malicious_domains,is_random)
 
+	if args.tenant:
+		tenant_iri=lookup_tenant_iri(args.server,headers,args.tenant)['@id']
 	# FortiGuard C&C scenario : 2 alerts, same dst IP, different src IP
 	if 	body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_TO_FORTIGUARD_MALWARE_IP':
 		source_ip='192.168.10.'+str(random.randint(100, 200))
 		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = source_ip
 		body['data'][0]['sourcedata']['incident']['incidentSrc'] = source_ip
-		fsr_send_alert(args.server,headers,body)
+		fsr_send_alert(args.server,headers,body,tenant_iri)
 		source_ip='192.168.10.'+str(random.randint(100, 200))
 		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = source_ip
 		body['data'][0]['sourcedata']['incident']['incidentSrc'] = source_ip
 		input('Type anykey to continue')
-		fsr_send_alert(args.server,headers,body)
+		fsr_send_alert(args.server,headers,body,tenant_iri)
 		exit()
-	if args.tenant:
-		fsr_send_alert(args.server,headers,body,lookup_tenant_iri(args.server,headers,args.tenant)['@id'])
-	else:
-		fsr_send_alert(args.server,headers,body)
+
+	fsr_send_alert(args.server,headers,body,tenant_iri)
 
 
 
