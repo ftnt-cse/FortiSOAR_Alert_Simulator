@@ -195,55 +195,66 @@ def cook_alert(incident,malware_hashes_file,malicious_urls_file,malicious_ip_fil
 	except IOError:
 		print(bcolors.FAIL+"Couldn't open template file: "+incident+bcolors.ENDC)
 		exit()
+	if "sourcedata" in incident_json:
 
-	body['data'][0]['sourcedata']=incident_json['sourcedata']
+		body['data'][0]['sourcedata']=incident_json['sourcedata']
+		# Common attributes
+		body['data'][0]['name']=body['data'][0]['sourcedata']['incident']['ruleName']
+		body['data'][0]['sourcedata']['incident']['id']	= random.randint(1, 9999999999)
+		body['data'][0]['sourcedata']['incident']['creationTime']= time.time()
+		body['data'][0]['sourcedata']['incident']['devImportance']		= random.randint(1, 4)
+		body['data'][0]['sourcedata']['incident']['lastSeenTime']		= time.time()
+		body['data'][0]['sourcedata']['incident']['incidentCount']		= random.randint(1, 20)
+		body['data'][0]['sourcedata']['incident']['firstSeenTime']		= time.time() - 3600
+		body['data'][0]['sourcedata']['incident']['lastModified']		= time.time()
+		body['data'][0]['sourcedata']['incident']['incidentId']			= random.randint(1, 999999)
+		# Specific attributes
+		if body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_AO_MALWARE_HASH_MATCH':
+			filename=''.join([random.choice(string.ascii_letters + string.digits) for n in range(16)])
+			body['data'][0]['sourcedata']['incident']['incidentDetail'] = "fileName:C:\\\\Windows\\\\System32\\\\"+\
+			filename+".exe, hashCode:"+get_malware_hashes(malware_hashes_file,is_random)+","
 
+		elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_DNS_FORTIGUARD_MALWARE_DOMAIN':
+			bad_domain = get_malicious_domains(malicious_domains_file,is_random)
+			body['data'][0]['sourcedata']['incident']['destName'] = bad_domain
+			body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destName:"+bad_domain+","
 
-	# Common attributes
-	body['data'][0]['name']=body['data'][0]['sourcedata']['incident']['ruleName']
-	body['data'][0]['sourcedata']['incident']['id']	= random.randint(1, 9999999999)
-	body['data'][0]['sourcedata']['incident']['creationTime']= time.time()
-	body['data'][0]['sourcedata']['incident']['devImportance']		= random.randint(1, 4)
-	body['data'][0]['sourcedata']['incident']['lastSeenTime']		= time.time()
-	body['data'][0]['sourcedata']['incident']['incidentCount']		= random.randint(1, 20)
-	body['data'][0]['sourcedata']['incident']['firstSeenTime']		= time.time() - 3600
-	body['data'][0]['sourcedata']['incident']['lastModified']		= time.time()
-	body['data'][0]['sourcedata']['incident']['incidentId']			= random.randint(1, 999999)
-	# Specific attributes
-	if body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_AO_MALWARE_HASH_MATCH':
-		filename=''.join([random.choice(string.ascii_letters + string.digits) for n in range(16)])
-		body['data'][0]['sourcedata']['incident']['incidentDetail'] = "fileName:C:\\\\Windows\\\\System32\\\\"+\
-		filename+".exe, hashCode:"+get_malware_hashes(malware_hashes_file,is_random)+","
+		elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_TO_FORTIGUARD_MALWARE_IP':
+			bad_ip = get_malicious_ip(malicious_ip_file,is_random)
+			body['data'][0]['sourcedata']['incident']['destIpAddr'] = bad_ip
+			body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destIpAddr:"+bad_ip+","
 
-	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_DNS_FORTIGUARD_MALWARE_DOMAIN':
-		bad_domain = get_malicious_domains(malicious_domains_file,is_random)
-		body['data'][0]['sourcedata']['incident']['destName'] = bad_domain
-		body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destName:"+bad_domain+","
+		elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_VPN_LOGON_SUCCESS_OUTSIDE_COUNTRY':
+			foreign_ip = "192.58.142."+str(random.randint(1, 254))
+			body['data'][0]['sourcedata']['incident']['sourceUser'] = random.choices(usernames)[0]
+			body['data'][0]['sourcedata']['incident']['srcIpAddr'] = foreign_ip
+			body['data'][0]['sourcedata']['incident']['incidentSrc'] = "srcIpAddr:"+foreign_ip+","
 
-	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_TO_FORTIGUARD_MALWARE_IP':
-		bad_ip = get_malicious_ip(malicious_ip_file,is_random)
-		body['data'][0]['sourcedata']['incident']['destIpAddr'] = bad_ip
-		body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destIpAddr:"+bad_ip+","
+		elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_HIGH_SEV_SEC_IPS_IN_PERMIT':
+			bad_ip = get_malicious_ip(malicious_ip_file,is_random)
+			#TODO : fetch IPS rules from FG and it it's attack ID, feed CSV to FSR Assets
+			body['data'][0]['sourcedata']['incident']['incidentDetail'] = "compEventType:FortiGate-ips-signature-"+str(random.randint(8000, 9000))+", attackName:, incidentCount:6,"
+			body['data'][0]['sourcedata']['incident']['srcIpAddr'] = bad_ip
+			body['data'][0]['sourcedata']['incident']['incidentSrc'] = "srcIpAddr:"+bad_ip+","
 
-	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_VPN_LOGON_SUCCESS_OUTSIDE_COUNTRY':
-		foreign_ip = "192.58.142."+str(random.randint(1, 254))
-		body['data'][0]['sourcedata']['incident']['sourceUser'] = random.choices(usernames)[0]
-		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = foreign_ip
-		body['data'][0]['sourcedata']['incident']['incidentSrc'] = "srcIpAddr:"+foreign_ip+","
+		elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_WEB_FORTIGUARD_MALWARE_URL':
+			bad_url = get_malicious_urls(malicious_urls,is_random)
+			body['data'][0]['sourcedata']['incident']['destName'] = bad_url.split("//")[1]
+			body['data'][0]['sourcedata']['incident']['incidentDetail'] = "infoURL:"+bad_url+","
+			body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destName:"+bad_url.split("//")[1]+","
 
-	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_HIGH_SEV_SEC_IPS_IN_PERMIT':
-		bad_ip = get_malicious_ip(malicious_ip_file,is_random)
-		#TODO : fetch IPS rules from FG and it it's attack ID, feed CSV to FSR Assets
-		body['data'][0]['sourcedata']['incident']['incidentDetail'] = "compEventType:FortiGate-ips-signature-"+str(random.randint(8000, 9000))+", attackName:, incidentCount:6,"
-		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = bad_ip
-		body['data'][0]['sourcedata']['incident']['incidentSrc'] = "srcIpAddr:"+bad_ip+","
+	elif "offense_data" in incident_json:
+		body['data'][0]['source']='QRadar'
+		body['data'][0]['name']='General Malware Attack'
+		#del body['data'][0]['sourcedata']
+		body['data'][0]['sourcedata']=incident_json
 
-	elif body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_WEB_FORTIGUARD_MALWARE_URL':
-		bad_url = get_malicious_urls(malicious_urls,is_random)
-		body['data'][0]['sourcedata']['incident']['destName'] = bad_url.split("//")[1]
-		body['data'][0]['sourcedata']['incident']['incidentDetail'] = "infoURL:"+bad_url+","
-		body['data'][0]['sourcedata']['incident']['incidentTarget'] = "destName:"+bad_url.split("//")[1]+","
-
+		event_data=body['data'][0]['sourcedata']['events_data']
+		for index in range(len(event_data)):
+			for key in event_data[index]:
+				body['data'][0]['sourcedata']['events_data'][index]['MD5_Hash']	= get_malware_hashes(malware_hashes_file,is_random)
+				body['data'][0]['sourcedata']['events_data'][index]['sourceip'] = "192.168.142."+str(random.randint(1, 254))
+				body['data'][0]['sourcedata']['events_data'][index]['destinationip'] = get_malicious_ip(malicious_ip_file,is_random)
 
 	return body
 
@@ -317,21 +328,22 @@ def main():
 
 	if args.tenant:
 		tenant_iri=lookup_tenant_iri(args.server,headers,args.tenant)['@id']
-	# FortiGuard C&C scenario : 2 alerts, same dst IP, different src IP
-	if 	body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_TO_FORTIGUARD_MALWARE_IP':
-		source_ip='192.168.10.'+str(random.randint(100, 200))
-		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = source_ip
-		body['data'][0]['sourcedata']['incident']['incidentSrc'] = source_ip
-		fsr_send_alert(args.server,headers,body,tenant_iri)
-		source_ip='192.168.10.'+str(random.randint(100, 200))
-		body['data'][0]['sourcedata']['incident']['srcIpAddr'] = source_ip
-		body['data'][0]['sourcedata']['incident']['incidentSrc'] = source_ip
-		input('Type anykey to continue')
-		fsr_send_alert(args.server,headers,body,tenant_iri)
-		exit()
+
+	if "sourcedata" in body:
+		# FortiGuard C&C scenario : 2 alerts, same dst IP, different src IP
+		if 	body['data'][0]['sourcedata']['incident']['incidentEt'] == 'PH_RULE_TO_FORTIGUARD_MALWARE_IP':
+			source_ip='192.168.10.'+str(random.randint(100, 200))
+			body['data'][0]['sourcedata']['incident']['srcIpAddr'] = source_ip
+			body['data'][0]['sourcedata']['incident']['incidentSrc'] = source_ip
+			fsr_send_alert(args.server,headers,body,tenant_iri)
+			source_ip='192.168.10.'+str(random.randint(100, 200))
+			body['data'][0]['sourcedata']['incident']['srcIpAddr'] = source_ip
+			body['data'][0]['sourcedata']['incident']['incidentSrc'] = source_ip
+			input('Type anykey to continue')
+			fsr_send_alert(args.server,headers,body,tenant_iri)
+			exit()
 
 	fsr_send_alert(args.server,headers,body,tenant_iri)
-
 
 
 if __name__ == '__main__':
