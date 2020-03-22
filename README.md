@@ -9,9 +9,90 @@ The Environement requires a FortiGate to be used as a response enforcement point
 
 ## Components:
 -Main script: The main cli
+
 -Modules Directory: Contain various functions libraries
+
 -Templates Directory: Contains the available templates to be used during the demo, each template file represents a scenario. it is a list of dictionary objects.
+
 ### Templates:
+A sample template structure:
+```json
+[
+{
+"data":[
+		{
+		"sleep":-1,
+		"name": "Traffic to FortiGuard Malware IP List",
+		"source":"FSM-INTL-DEMO",
+		"sourcedata":{
+			 	"incident": {
+						"id": 8119518313,
+						"xmlId": "Incident@000000000",
+						"ruleDesc": "Detects network traffic to FortiGuard Blocked IP List",
+						"ruleName": "Traffic to FortiGuard Malware IP List",
+						"severity": 9,
+						"origDevIp": "{{TR_FG_MGMT_IP}}",
+						"srcIpAddr": "{{TR_ASSET_IP}}1",
+						"cacheIndex": "<phCustId>2002</phCustId>",
+						"destIpAddr": "{{TR_MALICIOUS_IP}}",
+						"externalId": 8179,
+						"incidentEt": "PH_RULE_TO_FORTIGUARD_MALWARE_IP",
+						"origDevName": "{{TR_FG_DEV_NAME}}",
+						"severityCat": "HIGH",
+						"creationTime": "{{TR_NOW}}",
+						"deviceStatus": "Pending",
+						"lastModified": "{{TR_NOW}}",
+						"lastSeenTime": "{{TR_NOW}}",
+						"ticketStatus": "None",
+						"firstSeenTime": "{{TR_PAST}}",
+						"incidentCount": "{{TR_RANDOM_INTEGER}}",
+						"incidentTarget": "destIpAddr:,",
+						"incidentCategory": "Security/Command and Control",
+						"phIncidentCategory": "Network",
+						}
+				}
+		}
+	]
+},
+{
+"data":[
+		{
+		"sleep":0,
+		"name": "Traffic to FortiGuard Malware IP List",
+		"source":"FSM-INTL-DEMO",
+		"sourcedata":{
+			 	"incident": {
+						"id": 8119518313,
+						"xmlId": "Incident@000000000",
+						"ruleDesc": "Detects network traffic to FortiGuard Blocked IP List",
+						"ruleName": "Traffic to FortiGuard Malware IP List",
+						"severity": 9,
+						"origDevIp": "{{TR_FG_MGMT_IP}}",
+						"srcIpAddr": "{{TR_ASSET_IP}}2",
+						"cacheIndex": "<phCustId>2002</phCustId>",
+						"destIpAddr": "{{TR_MALICIOUS_IP}}",
+						"externalId": 8179,
+						"incidentEt": "PH_RULE_TO_FORTIGUARD_MALWARE_IP",
+						"origDevName": "{{TR_FG_DEV_NAME}}",
+						"severityCat": "HIGH",
+						"creationTime": "{{TR_NOW}}",
+						"deviceStatus": "Pending",
+						"lastModified": "{{TR_NOW}}",
+						"lastSeenTime": "{{TR_NOW}}",
+						"ticketStatus": "None",
+						"firstSeenTime": "{{TR_PAST}}",
+						"incidentCount": "{{TR_RANDOM_INTEGER}}",
+						"incidentTarget": "destIpAddr:,",
+						"incidentCategory": "Security/Command and Control",
+						"phIncidentCategory": "Network",
+						}
+				}
+		}
+	]
+}
+]
+```
+
 The template must not contain a duplicate of the dynamic variable, if a source IP for example is used as srcIpAddr, 
 so IncidentSrc should be empty. this is to maintain alert consitancy
 Template file contains the static text as sent from the alert source device and a set of variables delimited with {{}}. all the variables
