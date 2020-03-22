@@ -8,11 +8,10 @@ it is meant to run on FortiSOAR to simulates an Asset network (Defined in the to
 The Environement requires a FortiGate to be used as a response enforcement point.
 
 ## Components:
--Main script: The main cli
 
--Modules Directory: Contain various functions libraries
-
--Templates Directory: Contains the available templates to be used during the demo, each template file represents a scenario. it is a list of dictionary objects.
+- Main script: The main cli
+- Modules Directory: Contain various functions libraries
+- Templates Directory: Contains the available templates to be used during the demo, each template file represents a scenario. it is a list of dictionary objects.
 
 ### Templates:
 A sample template structure:

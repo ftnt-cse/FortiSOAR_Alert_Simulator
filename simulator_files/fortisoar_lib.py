@@ -1,12 +1,8 @@
 #!/bin/python3
-# FSR-Simulator is a CLI program to generate FSM like incidents for FSR
 # Function library to handle FortiSOAR communication
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND
 
 from .artifact_factory import *
-import requests, json, argparse, textwrap, random, time, os, csv, string
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def fsr_login(server,username,password):
 	body = {
@@ -62,6 +58,15 @@ def fsr_send_alert(server,headers,body, tenant=None):
 	try:
 		if tenant:
 			body['data'][0]['tenant'] = tenant
+
+		sleep=body['data'][0]['sleep']
+		if sleep:
+			if sleep >= 0:
+				print(bcolors.MSG+"Sleeping for {} seconds".format(sleep)+bcolors.ENDC)
+				time.sleep(sleep)
+			else:
+				input(bcolors.MSG+"Type any key to continue"+bcolors.ENDC)
+
 		response = requests.post(url='https://'+server+'/api/3/insert/alerts',
 			headers=headers,json=body,verify=False)
 
@@ -80,4 +85,16 @@ def fsr_send_alert(server,headers,body, tenant=None):
 		print(bcolors.FAIL+"Connection timeout"+bcolors.ENDC)
 		exit()
 
+def cook_alert(incident,malware_hashes_file,malicious_urls_file,malicious_ip_file,malicious_domains_file,is_random=True):
+	try:
+		with open(incident, 'r') as f:
+			template_file = f.read()
+		f.close()
+		tag_list = re.findall('\{\{(.*?)\}\}',template_file)
+		for tag in tag_list:
+			template_file=template_file.replace('{{'+tag+'}}',str(function_dictionary[tag]()))
+	except IOError:
+		print(bcolors.FAIL+"Couldn't open template file: "+incident+bcolors.ENDC)
+		exit()
 
+	return json.loads(template_file)

@@ -5,7 +5,7 @@
 # FortiSOAR CSE Team
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND
 
-import requests, json, random, time, os, csv
+import requests, argparse, textwrap, json, random, time, os, csv, re
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -19,8 +19,8 @@ malicious_urls		= './threat_intelligence/malicious_urls.txt'
 class bcolors:
 	OKGREEN = '\033[92m'
 	FAIL = '\033[91m'
+	MSG = '\033[96m'
 	ENDC = '\033[0m'
-
 
 def get_username():
 	usernames=['Sun.Tzu','Albert.Einstein','Isaac.Newton','Leonardo.Da.Vinci','Aristotle','Galileo.Galilei','Alexander.the.Great','Charles.Darwin','Plato','William.Shakespeare','Martin.Luther.Kin','Socrates','Mahatma.Gandhi','Abraham.Lincoln','George.Washington','Mose','Nikola.Tesla','Gautama.Buddha','Julius.Ceasar','Karl.Marx','Martin.Luther','Napoleon.Bonaparte','Johannes.Gutenberg']
@@ -42,6 +42,22 @@ def get_time_past():
 
 def get_random_integer(start=55555,end=99999):
 	random.randint(start, end)
+
+def get_my_public_ip():
+	try:
+		response = requests.get(url='https://api.ipify.org/?format=txt')
+		if response.status_code != 200:
+			print(bcolors.FAIL+'Public IP lookup Failed'+bcolors.ENDC)
+			exit()
+		public_ip=str(response.content, 'utf-8')
+		return '.'.join(public_ip.split('.')[:-1])+'.'+str(random.randint(2, 253))
+
+	except requests.ConnectionError:
+		print(bcolors.FAIL+"Connection error"+bcolors.ENDC)
+		exit()
+	except requests.ConnectTimeout:
+		print(bcolors.FAIL+"Connection timeout"+bcolors.ENDC)
+		exit()
 
 def get_malware_hash(malware_hashes_file=malware_hashes,is_random=True):
 
@@ -172,26 +188,16 @@ def get_malicious_domains(malicious_domains_file=malicious_domains,is_random=Tru
 
 function_dictionary={
 "TR_FG_MGMT_IP":get_fg_mgmt_ip,
+"TR_FG_DEV_NAME":get_fg_dev_name,
 "TR_ASSET_IP":get_asset_ip,
 "TR_MALICIOUS_IP":get_malicious_ip,
-"TR_FG_DEV_NAME":get_fg_dev_name,
 "TR_NOW":get_time_now,
 "TR_PAST":get_time_past,
 "TR_RANDOM_INTEGER":get_random_integer,
 "TR_MALICIOUS_DOMAIN":get_malicious_domains,
 "TR_MALICIOUS_URL":get_malicious_url,
-"TR_MALICIOUS_HASH":get_malware_hash
+"TR_MALICIOUS_HASH":get_malware_hash,
+"TR_PUBLIC_IP":get_my_public_ip
 }
 
-clean_artifact_dictionary={
-"TR_FG_MGMT_IP":get_fg_mgmt_ip,
-"TR_ASSET_IP":get_asset_ip,
-"TR_MALICIOUS_IP":get_malicious_ip,
-"TR_FG_DEV_NAME":get_fg_dev_name,
-"TR_NOW":get_time_now,
-"TR_PAST":get_time_past,
-"TR_RANDOM_INTEGER":get_random_integer,
-"TR_MALICIOUS_DOMAIN":get_malicious_domains,
-"TR_MALICIOUS_URL":get_malicious_url,
-"TR_MALICIOUS_HASH":get_malware_hash
-}
+
