@@ -92,11 +92,15 @@ A sample template structure:
 }
 ]
 ```
+- __"sleep":__ can take the values : 
+- -1 => the alert will be sent immediatly 
+- 0 => The user will be prompted to press any key to send the alert and continue to the next one
+- a positive integer would indicate the number of seconds to wait before sending the current alert
 
-The template must not contain a duplicate of the dynamic variable, if a source IP for example is used as srcIpAddr, 
+- The template must not contain a duplicate of the dynamic variable, if a source IP for example is used as srcIpAddr, 
 so IncidentSrc should be empty. this is to maintain alert consitancy
-Template file contains the static text as sent from the alert source device and a set of variables delimited with {{}}. all the variables
-will be replaced with their dynamic value at runtime. when a list of alerts is present within the same template it's possible to have different variable values
+Template file contains the static text as sent from the alert source device and a set of variables delimited with {{}}. 
+- All the variables will be replaced with their dynamic value at runtime. when a list of alerts is present within the same template it's possible to have different variable values
 by adding a digit at the end of the variable, example : {{TR_ASSET_IP}} is present in both alerts of the same template and we want its value to be different, 
 we can write it as : {{TR_ASSET_IP}}1 in the first alert and {{TR_ASSET_IP}}2 in the second, so whatever value will be taken at runtime it will have 1 and 2 
 at its end respectively 
