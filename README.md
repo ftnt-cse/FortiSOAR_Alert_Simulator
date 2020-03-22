@@ -9,7 +9,9 @@ The Environement requires a FortiGate to be used as a response enforcement point
 
 ## Components:
 -Main script: The main cli
+
 -Modules Directory: Contain various functions libraries
+
 -Templates Directory: Contains the available templates to be used during the demo, each template file represents a scenario. it is a list of dictionary objects.
 ### Templates:
 The template must not contain a duplicate of the dynamic variable, if a source IP for example is used as srcIpAddr, 
