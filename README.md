@@ -1,4 +1,5 @@
 # FortiSOAR Alert Simulator:
+
 ## Introduction:
 A tool meant to be used during demos to simulate a SOAR environement by sending a series of alerts with a specific timing according to a template. this creates a scenario to illustrate targeted FortiSOAR capabilities.
 it is meant to run on FortiSOAR to simulates an Asset network (Defined in the topology pptx) connected to the internet via FortiGate Firewall (FortiGate-Edge) and a set of alert sources including:
