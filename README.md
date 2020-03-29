@@ -20,7 +20,7 @@ A sample template structure:
 {
 "data":[
 		{
-		__"sleep":-1,__
+		"sleep":-1,
 		"name": "Traffic to FortiGuard Malware IP List",
 		"source":"FSM-INTL-DEMO",
 		"sourcedata":{
@@ -56,7 +56,7 @@ A sample template structure:
 {
 "data":[
 		{
-		__"sleep":0,__
+		"sleep":0,
 		"name": "Traffic to FortiGuard Malware IP List",
 		"source":"FSM-INTL-DEMO",
 		"sourcedata":{
@@ -102,3 +102,15 @@ All variables will be replaced with their dynamic value at runtime. when a list 
 
 If {{TR_ASSET_IP}} is present in both alerts of the same template it's possible to set the first as: {{TR_ASSET_IP}}1 and {{TR_ASSET_IP}}2 in the second, so the sent alert will have 2 values of {{TR_ASSET_IP}}
 
+The list of available dynamic values (Variables):
+- "TR_FG_MGMT_IP":get_fg_mgmt_ip
+- "TR_FG_DEV_NAME":get_fg_dev_name
+- "TR_ASSET_IP":get_asset_ip
+- "TR_MALICIOUS_IP":get_malicious_ip
+- "TR_NOW":get_time_now
+- "TR_PAST":get_time_past
+- "TR_RANDOM_INTEGER":get_random_integer
+- "TR_MALICIOUS_DOMAIN":get_malicious_domains
+- "TR_MALICIOUS_URL":get_malicious_url
+- "TR_MALICIOUS_HASH":get_malware_hash
+- "TR_PUBLIC_IP":get_my_public_ip
