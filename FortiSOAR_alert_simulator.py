@@ -36,8 +36,8 @@ def main():
 		tenant_iri=lookup_tenant_iri(args.server,headers,args.tenant)['@id']
 
 	for alert in alerts:
-		print(alert)
 		fsr_send_alert(args.server,headers,alert,tenant_iri)
+		print(bcolors.INST+"Step Instructions: \n"+alert['data'][0]['demo_message']+bcolors.ENDC)
 
 
 if __name__ == '__main__':

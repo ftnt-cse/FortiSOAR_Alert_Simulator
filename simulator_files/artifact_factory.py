@@ -20,7 +20,9 @@ class bcolors:
 	OKGREEN = '\033[92m'
 	FAIL = '\033[91m'
 	MSG = '\033[96m'
+	INST = '\033[95m'
 	ENDC = '\033[0m'
+
 
 def get_username():
 	usernames=['Sun.Tzu','Albert.Einstein','Isaac.Newton','Leonardo.Da.Vinci','Aristotle','Galileo.Galilei','Alexander.the.Great','Charles.Darwin','Plato','William.Shakespeare','Martin.Luther.Kin','Socrates','Mahatma.Gandhi','Abraham.Lincoln','George.Washington','Mose','Nikola.Tesla','Gautama.Buddha','Julius.Ceasar','Karl.Marx','Martin.Luther','Napoleon.Bonaparte','Johannes.Gutenberg']
@@ -41,7 +43,7 @@ def get_time_past():
 	return int(time.time()) - random.randint(3600, 86400)
 
 def get_random_integer(start=55555,end=99999):
-	random.randint(start, end)
+	return random.randint(start, end)
 
 def get_my_public_ip():
 	try:
