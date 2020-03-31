@@ -1,0 +1,840 @@
+{
+  "type": "workflow_collections",
+  "data": [
+    {
+      "@context": "/api/3/contexts/WorkflowCollection",
+      "@type": "WorkflowCollection",
+      "name": "00-Demo1",
+      "description": null,
+      "visible": true,
+      "image": null,
+      "id": 43,
+      "createDate": 1585633254,
+      "modifyDate": 1585633254,
+      "recordTags": [],
+      "workflows": [
+        {
+          "@type": "Workflow",
+          "triggerLimit": null,
+          "name": "Investigate Lateral Movement",
+          "aliasName": null,
+          "description": "Threat Hunting For Lateral Movement",
+          "collection": "/api/3/workflow_collections/eadb9e83-52e1-4b20-a020-f28cf753a0e9",
+          "tag": null,
+          "isActive": true,
+          "singleRecordExecution": false,
+          "remoteExecutableFlag": false,
+          "parameters": [],
+          "synchronous": false,
+          "triggerStep": "/api/3/workflow_steps/50f4f7b3-0dd3-4a0d-8063-e41ea731b8c7",
+          "steps": [
+            {
+              "@type": "WorkflowStep",
+              "name": "Start",
+              "description": null,
+              "arguments": {
+                "route": "ec7694af-1163-46e1-ba45-2193eb37d687",
+                "resources": [
+                  "alerts"
+                ],
+                "inputVariables": [],
+                "step_variables": {
+                  "input": {
+                    "records": "{{vars.input.records}}"
+                  }
+                },
+                "_promptexpanded": true,
+                "displayConditions": {
+                  "alerts": {
+                    "sort": [],
+                    "limit": 30,
+                    "logic": "AND",
+                    "filters": []
+                  },
+                  "assets": {
+                    "sort": [],
+                    "limit": 30,
+                    "logic": "AND",
+                    "filters": []
+                  }
+                },
+                "executeButtonText": "Execute",
+                "noRecordExecution": false,
+                "singleRecordExecution": true
+              },
+              "status": null,
+              "left": "40",
+              "top": "40",
+              "stepType": "/api/3/workflow_step_types/f414d039-bb0d-4e59-9c39-a8f1e880b18a",
+              "uuid": "50f4f7b3-0dd3-4a0d-8063-e41ea731b8c7"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Find Related Incidents",
+              "description": null,
+              "arguments": {
+                "query": {
+                  "sort": [],
+                  "limit": 30,
+                  "logic": "AND",
+                  "filters": [
+                    {
+                      "type": "primitive",
+                      "field": "receipientEmailAddress",
+                      "value": "%{{vars.input.records[0].source}}%",
+                      "operator": "like",
+                      "_operator": "like"
+                    }
+                  ]
+                },
+                "module": "incidents?$limit=30",
+                "step_variables": {
+                  "records_count": "{{vars.result | length}}"
+                }
+              },
+              "status": null,
+              "left": "240",
+              "top": "140",
+              "stepType": "/api/3/workflow_step_types/b593663d-7d13-40ce-a3a3-96dece928770",
+              "uuid": "b74d4757-0578-4445-a082-9b0223a356d5"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Records Found",
+              "description": null,
+              "arguments": {
+                "conditions": [
+                  {
+                    "option": "no",
+                    "default": true,
+                    "step_iri": "/api/3/workflow_steps/c6bb7a2e-5e4c-4de1-9a6b-ea422fabfe34"
+                  },
+                  {
+                    "option": "yes",
+                    "step_iri": "/api/3/workflow_steps/09a4aec2-01f8-4544-9e21-dd22388b98fa",
+                    "condition": "{{ vars.records_count > 0 }}"
+                  }
+                ]
+              },
+              "status": null,
+              "left": "420",
+              "top": "240",
+              "stepType": "/api/3/workflow_step_types/12254cf5-5db7-4b1a-8cb1-3af081924b28",
+              "uuid": "60b4c993-c018-4013-8f05-c567d417729e"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Increase Incident Severity",
+              "description": null,
+              "arguments": {
+                "resource": {
+                  "phase": {
+                    "id": 139,
+                    "@id": "/api/3/picklists/bb7407e0-f699-11e7-8c3f-9a214cf093ae",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "Containment",
+                    "listName": "/api/3/picklist_names/b862eb1f-b385-40ca-baa7-5a1b1f91a651",
+                    "itemValue": "Containment",
+                    "orderIndex": 3
+                  },
+                  "status": {
+                    "id": 110,
+                    "@id": "/api/3/picklists/bb7402d6-f699-11e7-8c3f-9a214cf093ae",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "In Progress",
+                    "listName": "/api/3/picklist_names/a549e41c-31ca-406d-89ae-eab3de5c06c4",
+                    "itemValue": "In Progress",
+                    "orderIndex": 1
+                  },
+                  "category": {
+                    "id": 174,
+                    "@id": "/api/3/picklists/70321ffa-f69a-11e7-8c3f-9a214cf093ae",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "Lateral Movement",
+                    "listName": "/api/3/picklist_names/f3938848-6220-4b27-af2d-a5329cf63656",
+                    "itemValue": "Lateral Movement",
+                    "orderIndex": 6
+                  },
+                  "severity": {
+                    "id": 69,
+                    "@id": "/api/3/picklists/7efa2220-39bb-44e4-961f-ac368776e3b0",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": "#e31b1d",
+                    "display": "Critical",
+                    "listName": "/api/3/picklist_names/4e80cba3-032f-48b4-ac03-17e3ec247aac",
+                    "itemValue": "Critical",
+                    "orderIndex": 4
+                  },
+                  "description": "<p>{{vars.steps.Find_Related_Incidents[0].description}}</p>\n<p>Related Alert:&nbsp;{{vars.input.records[0].name}} has been found. Incident severity increased.&nbsp;</p>",
+                  "incidentLead": "/api/3/people/3451141c-bac6-467c-8d72-85e0fab569ce"
+                },
+                "_showJson": false,
+                "operation": "Overwrite",
+                "collection": "{{vars.steps.Find_Related_Incidents[0]['@id']}}",
+                "collectionType": "/api/3/incidents",
+                "fieldOperation": {
+                  "recordTags": "Overwrite"
+                },
+                "step_variables": []
+              },
+              "status": null,
+              "left": "600",
+              "top": "465",
+              "stepType": "/api/3/workflow_step_types/b593663d-7d13-40ce-a3a3-96dece928722",
+              "uuid": "c9936f09-cf03-447c-b6a1-a78ea5832321"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Investigate Admin Creation",
+              "description": null,
+              "arguments": {
+                "resource": {
+                  "name": "Investigate Admin Creation {{vars.input.records[0].source}}",
+                  "type": {
+                    "id": 131,
+                    "@id": "/api/3/picklists/57c63309-ce90-48e7-95bd-5ecccbc851f7",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "Phone Call",
+                    "listName": "/api/3/picklist_names/b837e375-76af-4ba5-b6a1-bd1c3cd27292",
+                    "itemValue": "Phone Call",
+                    "orderIndex": 5
+                  },
+                  "alerts": "{{vars.input.records[0]['@id']}}",
+                  "status": {
+                    "id": 16,
+                    "@id": "/api/3/picklists/ab65eb0f-e7a7-4993-8474-da5c8b52f380",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "Assigned",
+                    "listName": "/api/3/picklist_names/21ddbcfd-b4a3-4273-adea-c674fe47d643",
+                    "itemValue": "Assigned",
+                    "orderIndex": 0
+                  },
+                  "priority": {
+                    "id": 144,
+                    "@id": "/api/3/picklists/90088ebe-0a7d-4aa6-9c9c-93b937a4e4f8",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": "#e36c29",
+                    "display": "High",
+                    "listName": "/api/3/picklist_names/bea9a490-50d1-4597-8ad9-24422e10676e",
+                    "itemValue": "High",
+                    "orderIndex": 2
+                  },
+                  "taskdata": "<p>Request detailed information from user&nbsp;{{vars.input.records[0].source}} about the admin account&nbsp;{{vars.input.records[0].recipientEmailAddress}}</p>",
+                  "tasktype": "Manual Investigation",
+                  "__replace": "",
+                  "description": "<p>Request detailed information from user {{vars.input.records[0].source}} about the admin account&nbsp;{{vars.input.records[0].recipientEmailAddress}}</p>",
+                  "assignedToPerson": "/api/3/people/3451141c-bac6-467c-8d72-85e0fab569ce"
+                },
+                "_showJson": false,
+                "operation": "Overwrite",
+                "collection": "/api/3/tasks",
+                "fieldOperation": {
+                  "recordTags": "Overwrite"
+                },
+                "step_variables": []
+              },
+              "status": null,
+              "left": "240",
+              "top": "340",
+              "stepType": "/api/3/workflow_step_types/2597053c-e718-44b4-8394-4d40fe26d357",
+              "uuid": "c6bb7a2e-5e4c-4de1-9a6b-ea422fabfe34"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Link Alert to Incident",
+              "description": null,
+              "arguments": {
+                "resource": {
+                  "incidents": "{{vars.steps.Find_Related_Incidents[0]['@id']}}"
+                },
+                "_showJson": false,
+                "operation": "Overwrite",
+                "collection": "{{vars.input.records[0]['@id']}}",
+                "collectionType": "/api/3/alerts",
+                "fieldOperation": {
+                  "recordTags": "Overwrite"
+                },
+                "step_variables": []
+              },
+              "status": null,
+              "left": "600",
+              "top": "340",
+              "stepType": "/api/3/workflow_step_types/b593663d-7d13-40ce-a3a3-96dece928722",
+              "uuid": "09a4aec2-01f8-4544-9e21-dd22388b98fa"
+            }
+          ],
+          "routes": [
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "ababf2fc-08b9-4f26-8080-d1da6dd62dcb",
+              "name": "Start -> Find Related Incidents",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/b74d4757-0578-4445-a082-9b0223a356d5",
+              "sourceStep": "/api/3/workflow_steps/50f4f7b3-0dd3-4a0d-8063-e41ea731b8c7"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "38c0e37f-b1d4-4256-8e7f-ddce9b5815d6",
+              "name": "Find Related Incidents -> Records Found",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/60b4c993-c018-4013-8f05-c567d417729e",
+              "sourceStep": "/api/3/workflow_steps/b74d4757-0578-4445-a082-9b0223a356d5"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "d20aa75d-360c-4aae-a27d-b542aaba05b9",
+              "name": "Records Found -> Investigate Admin Creation",
+              "label": "no",
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/c6bb7a2e-5e4c-4de1-9a6b-ea422fabfe34",
+              "sourceStep": "/api/3/workflow_steps/60b4c993-c018-4013-8f05-c567d417729e"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "8340cf6f-079e-487e-b838-1a0d18751fff",
+              "name": "Records Found -> Link Alert to Incident",
+              "label": "yes",
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/09a4aec2-01f8-4544-9e21-dd22388b98fa",
+              "sourceStep": "/api/3/workflow_steps/60b4c993-c018-4013-8f05-c567d417729e"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "35026102-9152-4917-be49-98ca288e8fc9",
+              "name": "Link Alert to Incident -> Increase Incident Severity",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/c9936f09-cf03-447c-b6a1-a78ea5832321",
+              "sourceStep": "/api/3/workflow_steps/09a4aec2-01f8-4544-9e21-dd22388b98fa"
+            }
+          ],
+          "versions": null,
+          "lastModifyDate": 1585677187,
+          "uuid": "6d5ae1b9-3d2c-4a3c-9a5e-095d1cab2f67",
+          "recordTags": [],
+          "isPrivate": false,
+          "owners": []
+        },
+        {
+          "@type": "Workflow",
+          "triggerLimit": null,
+          "name": "Email Investigation",
+          "aliasName": null,
+          "description": "Investigate Suspicious Email",
+          "collection": "/api/3/workflow_collections/eadb9e83-52e1-4b20-a020-f28cf753a0e9",
+          "tag": null,
+          "isActive": true,
+          "singleRecordExecution": false,
+          "remoteExecutableFlag": false,
+          "parameters": [],
+          "synchronous": false,
+          "triggerStep": "/api/3/workflow_steps/8aee3149-ddca-45d7-9b47-9173f2d55f5d",
+          "steps": [
+            {
+              "@type": "WorkflowStep",
+              "name": "Start",
+              "description": null,
+              "arguments": {
+                "resource": "alerts",
+                "resources": [
+                  "alerts"
+                ],
+                "step_variables": {
+                  "input": {
+                    "records": [
+                      "{{vars.input.records[0]}}"
+                    ]
+                  },
+                  "source_data": "{{vars.input.records[0].sourcedata}}"
+                },
+                "fieldbasedtrigger": {
+                  "sort": [],
+                  "limit": 30,
+                  "logic": "AND",
+                  "filters": [
+                    {
+                      "type": "primitive",
+                      "field": "source",
+                      "value": "%email%",
+                      "operator": "like",
+                      "_operator": "like"
+                    }
+                  ]
+                }
+              },
+              "status": null,
+              "left": "125",
+              "top": "30",
+              "stepType": "/api/3/workflow_step_types/ea155646-3821-4542-9702-b246da430a8d",
+              "uuid": "8aee3149-ddca-45d7-9b47-9173f2d55f5d"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Map Email Fields",
+              "description": null,
+              "arguments": {
+                "resource": {
+                  "name": "Suspicious Email :{{vars.source_data.headers.subject}}",
+                  "type": {
+                    "id": 121,
+                    "@id": "/api/3/picklists/0b3ef6f9-eb29-4ab9-ac98-98364bd1a3aa",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "Phishing",
+                    "listName": "/api/3/picklist_names/a7087b9c-5660-495f-a8ac-c3b198ddb8c2",
+                    "itemValue": "Phishing",
+                    "orderIndex": 7
+                  },
+                  "source": "{% if  'reporterEmailAddress' in vars.source_data %}User Reported{% else %}Email Server{% endif %}",
+                  "severity": {
+                    "id": 67,
+                    "@id": "/api/3/picklists/b3c20a3a-ecfd-4adc-a225-0205968e6793",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": "#D2AC1A",
+                    "display": "Medium",
+                    "listName": "/api/3/picklist_names/4e80cba3-032f-48b4-ac03-17e3ec247aac",
+                    "itemValue": "Medium",
+                    "orderIndex": 2
+                  },
+                  "sourceId": "{{ vars.source_data.headers['message-id'] | join }}",
+                  "sourcedata": "{{vars.source_data|toJSON}}",
+                  "senderDomain": "{% if vars.source_data.headers.from %}{{(vars.source_data.headers.from.split('<')[-1] | replace(\">\",\"\")).split('@')[-1] | replace(\">\",\"\")}}{% endif %}",
+                  "senderEmailAddress": "{% if vars.source_data.headers.from %}{{vars.source_data.headers.from.split('<')[-1] | replace(\">\",\"\")}}{% endif %}",
+                  "recipientEmailAddress": "{% if vars.source_data.headers['to'] is not string %}{{vars.source_data.headers['to'] | join(',') }}{%else%}{{vars.source_data.headers['to']}}{% endif%}"
+                },
+                "_showJson": false,
+                "operation": "Overwrite",
+                "collection": "{{vars.input.records[0]['@id']}}",
+                "collectionType": "/api/3/alerts",
+                "fieldOperation": {
+                  "recordTags": "Overwrite"
+                },
+                "step_variables": []
+              },
+              "status": null,
+              "left": "125",
+              "top": "165",
+              "stepType": "/api/3/workflow_step_types/b593663d-7d13-40ce-a3a3-96dece928722",
+              "uuid": "8aa43714-b01f-4c9b-b0b0-b997180fd380"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Create Email",
+              "description": null,
+              "arguments": {
+                "resource": {
+                  "alerts": "{{vars.input.records[0]['@id']}}",
+                  "emailTo": "{{vars.steps.Map_Email_Fields.recipientEmailAddress}}",
+                  "sourceId": "{{vars.input.records[0].sourceId}}",
+                  "__replace": "",
+                  "emailBody": "<p>{{vars.source_data.body.html}}</p>",
+                  "emailFrom": "{{vars.steps.Map_Email_Fields.senderEmailAddress}}",
+                  "emailHeader": "{{vars.source_data.headers}}",
+                  "emailSubject": "{{vars.source_data.headers.subject}}"
+                },
+                "_showJson": false,
+                "operation": "Overwrite",
+                "collection": "/api/3/emails",
+                "fieldOperation": {
+                  "recordTags": "Overwrite"
+                },
+                "step_variables": []
+              },
+              "status": null,
+              "left": "125",
+              "top": "300",
+              "stepType": "/api/3/workflow_step_types/2597053c-e718-44b4-8394-4d40fe26d357",
+              "uuid": "50e3c7b7-cdd7-4c7e-8062-9ca99281521e"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Extract Artifacts",
+              "description": null,
+              "arguments": {
+                "params": {
+                  "data": "{{vars.source_data.body}}",
+                  "whitelist": "",
+                  "case_sensitive": false,
+                  "override_regex": false,
+                  "private_whitelist": true
+                },
+                "version": "3.0.1",
+                "connector": "cyops_utilities",
+                "operation": "extract_artifacts",
+                "operationTitle": "FSR: Extract Artifacts from String",
+                "step_variables": []
+              },
+              "status": null,
+              "left": "125",
+              "top": "435",
+              "stepType": "/api/3/workflow_step_types/0109f35d-090b-4a2b-bd8a-94cbc3508562",
+              "uuid": "359ec98f-2d6c-4b1e-8c6e-bbb7f74625d5"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Get URL Reputation",
+              "description": null,
+              "arguments": {
+                "name": "VirusTotal",
+                "config": "ebc6f008-cde9-425f-9d7e-17197b0af27b",
+                "params": {
+                  "url": "{{vars.steps.Extract_Artifacts.data.URL.0}}"
+                },
+                "version": "1.0.1",
+                "connector": "virustotal",
+                "operation": "scan_url",
+                "operationTitle": "Submit URL for scanning",
+                "step_variables": []
+              },
+              "status": null,
+              "left": "125",
+              "top": "570",
+              "stepType": "/api/3/workflow_step_types/0bfed618-0316-11e7-93ae-92361f002671",
+              "uuid": "1cdb7225-b54a-4a01-9838-276808d4766d"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Is Malicious",
+              "description": null,
+              "arguments": {
+                "conditions": [
+                  {
+                    "option": "yes",
+                    "step_iri": "/api/3/workflow_steps/968f0854-21bd-4d4e-8580-6d38d1e2611e",
+                    "condition": "{{ vars.steps.Get_URL_Reputation.data.aggregate > 1 }}"
+                  },
+                  {
+                    "option": "no",
+                    "default": true,
+                    "step_iri": "/api/3/workflow_steps/73e2017b-2531-40af-bc52-5d8a7b5e5218"
+                  }
+                ]
+              },
+              "status": null,
+              "left": "449",
+              "top": "571",
+              "stepType": "/api/3/workflow_step_types/12254cf5-5db7-4b1a-8cb1-3af081924b28",
+              "uuid": "b501c9b6-88fc-4131-9ccf-cd09442ccd1a"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Do Nothing",
+              "description": null,
+              "arguments": {
+                "params": [],
+                "version": "3.0.1",
+                "connector": "cyops_utilities",
+                "operation": "no_op",
+                "operationTitle": "Utils: No Operation",
+                "step_variables": []
+              },
+              "status": null,
+              "left": "447",
+              "top": "451",
+              "stepType": "/api/3/workflow_step_types/0109f35d-090b-4a2b-bd8a-94cbc3508562",
+              "uuid": "73e2017b-2531-40af-bc52-5d8a7b5e5218"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Create Indicator",
+              "description": null,
+              "arguments": {
+                "resource": {
+                  "value": "{{vars.steps.Extract_Artifacts.data.URL.0}}",
+                  "alerts": "{{vars.input.records[0]['@id']}}",
+                  "emails": "{{vars.steps.Create_Email['@id']}}",
+                  "sources": "VirusTotal.com",
+                  "__replace": "",
+                  "reputation": {
+                    "id": 196,
+                    "@id": "/api/3/picklists/7074e547-7785-4979-be32-c6d0c863e4bd",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": "#c42323",
+                    "display": "Malicious",
+                    "listName": "/api/3/picklist_names/e75ed3c3-9f23-4a43-832b-0daf236209ba",
+                    "itemValue": "Malicious",
+                    "orderIndex": 1
+                  },
+                  "description": "<p>Malicious URL rated by VirusTotal</p>\n<p>Email received from:&nbsp;{{vars.input.records[0].senderEmailAddress}}</p>\n<p>Email Sent to:&nbsp;{{vars.input.records[0].recipientEmailAddress}}</p>",
+                  "typeofindicator": {
+                    "id": 80,
+                    "@id": "/api/3/picklists/353a37b4-3eeb-43ee-aac6-64806422cfec",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "URL",
+                    "listName": "/api/3/picklist_names/50ee5bfa-e18f-49ba-8af9-dcca25b0f9c0",
+                    "itemValue": "URL",
+                    "orderIndex": 10
+                  }
+                },
+                "_showJson": false,
+                "operation": "Overwrite",
+                "collection": "/api/3/indicators",
+                "fieldOperation": {
+                  "recordTags": "Overwrite"
+                },
+                "step_variables": []
+              },
+              "status": null,
+              "left": "768",
+              "top": "570",
+              "stepType": "/api/3/workflow_step_types/2597053c-e718-44b4-8394-4d40fe26d357",
+              "uuid": "968f0854-21bd-4d4e-8580-6d38d1e2611e"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Escalate Alert",
+              "description": null,
+              "arguments": {
+                "resource": {
+                  "status": {
+                    "id": 23,
+                    "@id": "/api/3/picklists/a53d5465-75a6-4b7a-8144-4eccc23cea4a",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "Pending",
+                    "listName": "/api/3/picklist_names/33e964a9-d607-49f2-813c-7ce46141815a",
+                    "itemValue": "Pending",
+                    "orderIndex": 3
+                  },
+                  "severity": {
+                    "id": 69,
+                    "@id": "/api/3/picklists/7efa2220-39bb-44e4-961f-ac368776e3b0",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": "#e31b1d",
+                    "display": "Critical",
+                    "listName": "/api/3/picklist_names/4e80cba3-032f-48b4-ac03-17e3ec247aac",
+                    "itemValue": "Critical",
+                    "orderIndex": 4
+                  },
+                  "assignedTo": "/api/3/people/3451141c-bac6-467c-8d72-85e0fab569ce",
+                  "indicators": "{{vars.steps.Create_Indicator['@id']}}",
+                  "description": "<p>Email from&nbsp;{{vars.input.records[0].recipientEmailAddress}} Received with a malicious URL</p>",
+                  "targetAsset": "{{vars.input.records[0].sourcedata.headers.to.split('@')[1].split('<')[1]}}",
+                  "escalatedtoincident": {
+                    "id": 200,
+                    "@id": "/api/3/picklists/fa12313b-66af-4a2e-864e-a5f19241b734",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": "#bf0a0a",
+                    "display": "Yes",
+                    "listName": "/api/3/picklist_names/e131cc54-9ae4-43c9-b830-af6e331fe024",
+                    "itemValue": "Yes",
+                    "orderIndex": 0
+                  }
+                },
+                "_showJson": false,
+                "operation": "Overwrite",
+                "collection": "{{vars.input.records[0]['@id']}}",
+                "collectionType": "/api/3/alerts",
+                "fieldOperation": {
+                  "recordTags": "Overwrite"
+                },
+                "step_variables": []
+              },
+              "status": null,
+              "left": "1109",
+              "top": "570",
+              "stepType": "/api/3/workflow_step_types/b593663d-7d13-40ce-a3a3-96dece928722",
+              "uuid": "2431c138-e6e7-4d5c-bba6-6879fcc5a3db"
+            },
+            {
+              "@type": "WorkflowStep",
+              "name": "Create Incident",
+              "description": null,
+              "arguments": {
+                "resource": {
+                  "name": "Incident - {{vars.input.records[0].name}}",
+                  "phase": {
+                    "id": 139,
+                    "@id": "/api/3/picklists/bb7407e0-f699-11e7-8c3f-9a214cf093ae",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "Containment",
+                    "listName": "/api/3/picklist_names/b862eb1f-b385-40ca-baa7-5a1b1f91a651",
+                    "itemValue": "Containment",
+                    "orderIndex": 3
+                  },
+                  "alerts": "{{vars.input.records[0]['@id']}}",
+                  "emails": "{{vars.steps.Create_Email['@id']}}",
+                  "status": {
+                    "id": 110,
+                    "@id": "/api/3/picklists/bb7402d6-f699-11e7-8c3f-9a214cf093ae",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "In Progress",
+                    "listName": "/api/3/picklist_names/a549e41c-31ca-406d-89ae-eab3de5c06c4",
+                    "itemValue": "In Progress",
+                    "orderIndex": 1
+                  },
+                  "category": {
+                    "id": 177,
+                    "@id": "/api/3/picklists/703222e8-f69a-11e7-8c3f-9a214cf093ae",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": null,
+                    "display": "Phishing",
+                    "listName": "/api/3/picklist_names/f3938848-6220-4b27-af2d-a5329cf63656",
+                    "itemValue": "Phishing",
+                    "orderIndex": 9
+                  },
+                  "severity": {
+                    "id": 68,
+                    "@id": "/api/3/picklists/40187287-89fc-4e9c-b717-e9443d57eedb",
+                    "icon": null,
+                    "@type": "Picklist",
+                    "color": "#DE7A13",
+                    "display": "High",
+                    "listName": "/api/3/picklist_names/4e80cba3-032f-48b4-ac03-17e3ec247aac",
+                    "itemValue": "High",
+                    "orderIndex": 3
+                  },
+                  "__replace": "",
+                  "nextsteps": "<p>Monitor the asset&nbsp;behavior</p>",
+                  "indicators": "{{vars.steps.Create_Indicator['@id']}}",
+                  "sourcedata": "{{vars.input.records[0].sourcedata}}",
+                  "description": "<p><strong>{{vars.input.records[0].recipientEmailAddress}} </strong>is Targeted with a Phishing email</p>",
+                  "targetAsset": "{{vars.input.records[0].sourcedata.headers.to.split('@')[1].split('<')[1]}}",
+                  "incidentLead": "/api/3/people/3451141c-bac6-467c-8d72-85e0fab569ce",
+                  "senderDomain": "{{vars.input.records[0].senderDomain}}",
+                  "senderEmailAddress": "{{vars.steps.Create_Email.emailFrom}}",
+                  "receipientEmailAddress": "{{vars.steps.Create_Email.emailTo}}"
+                },
+                "_showJson": false,
+                "operation": "Overwrite",
+                "collection": "/api/3/incidents",
+                "fieldOperation": {
+                  "recordTags": "Overwrite"
+                },
+                "step_variables": []
+              },
+              "status": null,
+              "left": "1430",
+              "top": "570",
+              "stepType": "/api/3/workflow_step_types/2597053c-e718-44b4-8394-4d40fe26d357",
+              "uuid": "548e6fdd-ee16-4220-90d4-6bb5dddeb5fa"
+            }
+          ],
+          "routes": [
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "a3293566-cd79-4d9f-9006-9eb1e8ad9eda",
+              "name": "Start -> Map Email Fields",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/8aa43714-b01f-4c9b-b0b0-b997180fd380",
+              "sourceStep": "/api/3/workflow_steps/8aee3149-ddca-45d7-9b47-9173f2d55f5d"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "07d729ef-f856-4849-b949-a35bc7500176",
+              "name": "Map Email Fields -> Create Email",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/50e3c7b7-cdd7-4c7e-8062-9ca99281521e",
+              "sourceStep": "/api/3/workflow_steps/8aa43714-b01f-4c9b-b0b0-b997180fd380"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "0a5f9711-335d-4225-9c04-591a6ea57c88",
+              "name": "Create Email -> Extract Artifacts",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/359ec98f-2d6c-4b1e-8c6e-bbb7f74625d5",
+              "sourceStep": "/api/3/workflow_steps/50e3c7b7-cdd7-4c7e-8062-9ca99281521e"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "a10a6c99-04b3-4123-81d6-877cdd250640",
+              "name": "Extract Artifacts -> Get URL Reputation",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/1cdb7225-b54a-4a01-9838-276808d4766d",
+              "sourceStep": "/api/3/workflow_steps/359ec98f-2d6c-4b1e-8c6e-bbb7f74625d5"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "ea2f7323-083f-4b31-8815-b0f646f97f64",
+              "name": "Get URL Reputation -> Is Malicious",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/b501c9b6-88fc-4131-9ccf-cd09442ccd1a",
+              "sourceStep": "/api/3/workflow_steps/1cdb7225-b54a-4a01-9838-276808d4766d"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "74bf88a5-7e47-47f8-a949-0f88103d6ef8",
+              "name": "Is Malicious -> Do Nothing",
+              "label": "no",
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/73e2017b-2531-40af-bc52-5d8a7b5e5218",
+              "sourceStep": "/api/3/workflow_steps/b501c9b6-88fc-4131-9ccf-cd09442ccd1a"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "7a01e98e-bad6-4140-bede-949183aa8190",
+              "name": "Is Malicious -> Create Indicator",
+              "label": "yes",
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/968f0854-21bd-4d4e-8580-6d38d1e2611e",
+              "sourceStep": "/api/3/workflow_steps/b501c9b6-88fc-4131-9ccf-cd09442ccd1a"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "f3f4302e-8ce4-4477-a892-9c2d560722f1",
+              "name": "Create Indicator -> Escalate Alert",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/2431c138-e6e7-4d5c-bba6-6879fcc5a3db",
+              "sourceStep": "/api/3/workflow_steps/968f0854-21bd-4d4e-8580-6d38d1e2611e"
+            },
+            {
+              "@type": "WorkflowRoute",
+              "uuid": "b68751b7-2233-46b1-92fd-41afd3dcc877",
+              "name": "Escalate Alert -> Create Incident",
+              "label": null,
+              "isExecuted": false,
+              "targetStep": "/api/3/workflow_steps/548e6fdd-ee16-4220-90d4-6bb5dddeb5fa",
+              "sourceStep": "/api/3/workflow_steps/2431c138-e6e7-4d5c-bba6-6879fcc5a3db"
+            }
+          ],
+          "versions": null,
+          "lastModifyDate": 1585666399,
+          "uuid": "cd166539-6330-49c1-8b91-4c500da2f07a",
+          "recordTags": [
+            "/api/3/tags/email",
+            "/api/3/tags/phishing"
+          ],
+          "isPrivate": false,
+          "owners": []
+        }
+      ]
+    }
+  ],
+  "exported_tags": [
+    "email",
+    "phishing"
+  ]
+}
