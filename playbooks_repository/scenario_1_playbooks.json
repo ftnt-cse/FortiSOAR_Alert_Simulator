@@ -411,8 +411,8 @@
                 }
               },
               "status": null,
-              "left": "1040",
-              "top": "280",
+              "left": "1246",
+              "top": "388",
               "stepType": "/api/3/workflow_step_types/2597053c-e718-44b4-8394-4d40fe26d357",
               "uuid": "5cd55a32-2a7a-4adb-9510-6f837e76b067"
             },
@@ -472,8 +472,8 @@
                 "relatedIncidents": "{{vars.alertdata.incidents[0]['@id']}}"
               },
               "status": null,
-              "left": "680",
-              "top": "408",
+              "left": "860",
+              "top": "389",
               "stepType": "/api/3/workflow_step_types/04d0cf46-b6a8-42c4-8683-60a7eaa69e8f",
               "uuid": "e819cd51-d55a-4a77-a282-d877f50a987a"
             },
@@ -521,7 +521,7 @@
                 "step_variables": []
               },
               "status": null,
-              "left": "680",
+              "left": "860",
               "top": "528",
               "stepType": "/api/3/workflow_step_types/b593663d-7d13-40ce-a3a3-96dece928722",
               "uuid": "57ce4d6b-d36b-476c-9be6-2f6ab7b9a2da"
@@ -755,7 +755,7 @@
                 "step_variables": []
               },
               "status": null,
-              "left": "1040",
+              "left": "1247",
               "top": "528",
               "stepType": "/api/3/workflow_step_types/2597053c-e718-44b4-8394-4d40fe26d357",
               "uuid": "283d113b-e058-4bc5-8d63-2c38bbc37f20"
@@ -935,7 +935,7 @@
             }
           ],
           "versions": null,
-          "lastModifyDate": 1585557188,
+          "lastModifyDate": 1585685907,
           "uuid": "662a5f9f-ff00-41c0-8b7d-61f93b3ad724",
           "recordTags": [],
           "isPrivate": false,
