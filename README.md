@@ -104,6 +104,7 @@ If {{TR_ASSET_IP}} is present in both alerts of the same template it's possible 
 
 The list of available dynamic values (Variables):
 |"VARIABLE"|function name|use case|
+|:----------|:-------------|:-------------|
 |"TR_FG_MGMT_IP"|get_fg_mgmt_ip|get fortigate mgmt IP (according to the topology file)|
 |"TR_FG_DEV_NAME"|get_fg_dev_name|get fortigate device name (according to the topology file)|
 |"TR_ASSET_IP"|get_asset_ip| get a random local IP|
