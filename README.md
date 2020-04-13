@@ -103,14 +103,22 @@ All variables will be replaced with their dynamic value at runtime. when a list 
 If {{TR_ASSET_IP}} is present in both alerts of the same template it's possible to set the first as: {{TR_ASSET_IP}}1 and {{TR_ASSET_IP}}2 in the second, so the sent alert will have 2 values of {{TR_ASSET_IP}}
 
 The list of available dynamic values (Variables):
-- "TR_FG_MGMT_IP":get_fg_mgmt_ip
-- "TR_FG_DEV_NAME":get_fg_dev_name
-- "TR_ASSET_IP":get_asset_ip
-- "TR_MALICIOUS_IP":get_malicious_ip
-- "TR_NOW":get_time_now
-- "TR_PAST":get_time_past
-- "TR_RANDOM_INTEGER":get_random_integer
-- "TR_MALICIOUS_DOMAIN":get_malicious_domains
-- "TR_MALICIOUS_URL":get_malicious_url
-- "TR_MALICIOUS_HASH":get_malware_hash
-- "TR_PUBLIC_IP":get_my_public_ip
+|"VARIABLE"|function name|use case|
+|"TR_FG_MGMT_IP"|get_fg_mgmt_ip|get fortigate mgmt IP (according to the topology file)|
+|"TR_FG_DEV_NAME"|get_fg_dev_name|get fortigate device name (according to the topology file)|
+|"TR_ASSET_IP"|get_asset_ip| get a random local IP|
+|"TR_MALICIOUS_IP"|get_malicious_ip| get a malicious IP from CTI|
+|"TR_NOW"|get_time_now|get current timestamp|
+|"TR_RANDOM_INTEGER"|get_random_integer|get random number between 55555 and 99999|
+|"TR_MALICIOUS_DOMAIN"|get_malicious_domains| get a malicious domain name from CTI|
+|"TR_MALICIOUS_URL"|get_malicious_url|get a malicious url from CTI|
+|"TR_MALICIOUS_HASH"|get_malware_hash|get malicious hash from CTI|
+|"TR_PUBLIC_IP"|get_my_public_ip|get your public IP address|
+|"TR_PAST"|get_time_past |up to a couple of days ago|
+|"TR_T-1"|get_time_minus_one |get timestamp of about one hour ago|
+|"TR_T-2"|get_time_minus_two |get timestamp of about two hours ago|
+|"TR_T-3"|get_time_minus_tree|get timestamp of about three hours ago|
+|"TR_T-4"|get_time_minus_four|get timestamp of about four hours ago|
+|"TR_T-5"|get_time_minus_five|get timestamp of about five hours ago|
+|"TR_T-6"|get_time_minus_six (get timestamp of about six hours ago)
+|"TR_USERNAME"|get_username|a random username|
